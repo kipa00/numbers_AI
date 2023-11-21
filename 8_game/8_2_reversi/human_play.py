@@ -19,7 +19,7 @@ class GameUI(tk.Frame):
     # 초기화
     def __init__(self, master=None, model=None):
         tk.Frame.__init__(self, master)
-        self.master.title('오셀로')
+        self.master.title('Numbers')
 
         # 게임 상태 생성
         self.state = State()
@@ -28,7 +28,7 @@ class GameUI(tk.Frame):
         self.next_action = pv_mcts_action(model, 0.0)
 
         # 캔버스 생성
-        self.c = tk.Canvas(self, width=240, height=240, highlightthickness=0)
+        self.c = tk.Canvas(self, width=360, height=480, highlightthickness=0)
         self.c.bind('<Button-1>', self.turn_of_human)
         self.c.pack()
 
@@ -48,17 +48,18 @@ class GameUI(tk.Frame):
             return
 
         # 클릭 위치를 행동으로 변환
-        x = int(event.x / 40)
-        y = int(event.y / 40)
-        if x < 0 or 5 < x or y < 0 or 5 < y:  # 범위 외
-            return
-        action = x + y * 6
+        action: int
+        if 45 <= event.x < 315:
+            if 385 <= event.y < 415:
+                action = (event.x - 45) // 30
+            elif 425 <= event.y < 455:
+                action = 9 + (event.x - 45) // 30
+            else:
+                return
 
         # 합법적인 수가 아닌 경우
         legal_actions = self.state.legal_actions()
-        if legal_actions == [36]:
-            action = 36  # 패스
-        if action != 36 and not (action in legal_actions):
+        if action not in legal_actions:
             return
 
         # 다음 상태 얻기
@@ -83,26 +84,37 @@ class GameUI(tk.Frame):
 
     # 돌 그리기
     def draw_piece(self, index, first_player):
-        x = (index % 6) * 40 + 5
-        y = int(index / 6) * 40 + 5
+        x = (index % 6) * 60 + 5
+        y = index // 6 * 60 + 5
         if first_player:
-            self.c.create_oval(x, y, x + 30, y + 30, width=1.0, outline='#000000', fill='#C2272D')
+            self.c.create_oval(x, y, x + 50, y + 50, width=1.0, outline='#000000', fill='#009900')
         else:
-            self.c.create_oval(x, y, x + 30, y + 30, width=1.0, outline='#000000', fill='#FFFFFF')
+            self.c.create_oval(x, y, x + 50, y + 50, width=1.0, outline='#000000', fill='#cc00cc')
 
     # 화면 갱신
     def on_draw(self):
         self.c.delete('all')
-        self.c.create_rectangle(0, 0, 240, 240, width=0.0, fill='#C69C6C')
-        for i in range(1, 8):
-            self.c.create_line(0, i * 40, 240, i * 40, width=1.0, fill='#000000')
-            self.c.create_line(i * 40, 0, i * 40, 240, width=1.0, fill='#000000')
+        self.c.create_rectangle(0, 0, 360, 480, width=0.0, fill='black')
         for i in range(36):
             if self.state.pieces[i] == 1:
                 self.draw_piece(i, self.state.is_first_player())
             if self.state.enemy_pieces[i] == 1:
                 self.draw_piece(i, not self.state.is_first_player())
 
+        self.c.create_line(0, 360, 360, 360, width=1.0, fill='white')
+        self.c.create_rectangle(45, 385, 315, 415, width=0.0, fill='#333333')
+        self.c.create_rectangle(45, 425, 315, 455, width=0.0, fill='#333333')
+
+        x,y = self.state.slider_info
+        self.c.create_rectangle(15 + x * 30, 385, 45 + x * 30, 415, width=0.0, fill='#000099')
+        self.c.create_rectangle(15 + y * 30, 425, 45 + y * 30, 455, width=0.0, fill='#000099')
+        D = list({x * y for x in range(1, 10) for y in range(1, 10)})
+        D.sort()
+        for i,x in enumerate(D):
+            self.c.create_text((i % 6) * 60 + 30, (i // 6) * 60 + 30, text=f'{x}', fill='white', font=('Helvetica 15'))
+        for i in range(1, 10):
+            self.c.create_text(i * 30 + 30, 400, text=f'{i}', fill='white', font=('Helvetica 15'))
+            self.c.create_text(i * 30 + 30, 440, text=f'{i}', fill='white', font=('Helvetica 15'))
 
 # 게임 UI 실행
 f = GameUI(model=model)

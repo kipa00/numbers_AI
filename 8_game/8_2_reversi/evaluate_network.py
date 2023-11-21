@@ -12,7 +12,7 @@ from shutil import copy
 import numpy as np
 
 # 파라미터 준비
-EN_GAME_COUNT = 10  # 평가 1회 당 게임 수(오리지널: 400)
+EN_GAME_COUNT = 40  # 평가 1회 당 게임 수(오리지널: 400)
 EN_TEMPERATURE = 1.0  # 볼츠만 분포 온도
 
 

@@ -10,10 +10,10 @@ from tensorflow.keras import backend as K
 import os
 
 # 파라미터 준비
-DN_FILTERS = 128  # 컨볼루션 레이어 커널 수(오리지널: 256))
+DN_FILTERS = 64  # 컨볼루션 레이어 커널 수(오리지널: 256))
 DN_RESIDUAL_NUM = 16  # 레지듀얼 블록 수(오리지널: 19)
-DN_INPUT_SHAPE = (6, 6, 2)  # 입력 셰이프
-DN_OUTPUT_SIZE = 37  # 행동 수(배치 위치(6*6) + 패스(1))
+DN_INPUT_SHAPE = (6, 6, 3)  # 입력 셰이프(오리지널: (6, 6, 2))
+DN_OUTPUT_SIZE = 18  # 행동 수(오리지널: 37 = 배치 위치(6*6) + 패스(1))
 
 
 # 컨볼루션 레이어 생성
